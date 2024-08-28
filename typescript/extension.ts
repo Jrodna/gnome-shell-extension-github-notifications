@@ -7,11 +7,13 @@ import St from 'gi://St'
 
 import { Extension } from 'resource:///org/gnome/shell/extensions/extension.js'
 import * as Main from 'resource:///org/gnome/shell/ui/main.js'
-import { SystemNotificationSource, Notification } from 'resource:///org/gnome/shell/ui/messageTray.js'
+import * as PanelMenu from 'resource:///org/gnome/shell/ui/panelMenu.js'
+import { Source, Notification, getSystemSource ,NotificationDestroyedReason} from 'resource:///org/gnome/shell/ui/messageTray.js'
 
 import type { Input, Item, Output } from './bindings/types.js'
 import { info, error } from './log.js'
 
+type customPanelProps = {_rightBox: St.BoxLayout};
 class GithubNotifications {
   private token: string = ''
   private hideWidget: boolean = false
@@ -26,12 +28,13 @@ class GithubNotifications {
   private hasLazilyInit: boolean = false
   private showAlertNotification: boolean = false
   private showParticipatingOnly: boolean = false
-  private _source: SystemNotificationSource | null = null
+  private _source: Source | null = null
   private extension: GithubNotificationsExtension
   private settings: Gio.Settings
   private box: St.BoxLayout
   private domain: string
   private label: St.Label
+  private _indicator: PanelMenu.Button | null
 
   public constructor(extension: GithubNotificationsExtension) {
     this.extension = extension
@@ -61,13 +64,13 @@ class GithubNotifications {
     if (!this.hasLazilyInit) {
       this.lazyInit()
     }
-    this.fetchNotifications().catch(err => error('[fetch] ' + err))
-    Main.panel._rightBox.insert_child_at_index(this.box, 0) // TODO: patch type definition
+    this.fetchNotifications().catch(err => error('[fetch] ' + err));
+    (Main.panel as any)._rightBox.insert_child_at_index(this.box, 0) // TODO: patch type definition
   }
 
   public stop(): void {
-    this.stopLoop()
-    Main.panel._rightBox.remove_child(this.box)
+    this.stopLoop();
+    (Main.panel as any)._rightBox.remove_child(this.box)
   }
 
   private reloadSettings(): void {
@@ -116,10 +119,10 @@ class GithubNotifications {
     let icon = new St.Icon({
       style_class: 'system-status-icon',
     })
-    icon.gicon = Gio.icon_new_for_string(GLib.build_filenamev([this.extension.path, 'github.svg']))
+    icon.set_gicon(Gio.icon_new_for_string(GLib.build_filenamev([this.extension.path, 'github.svg'])))
 
-    this.box.add_actor(icon)
-    this.box.add_actor(this.label)
+    this.box.add_child(icon)
+    this.box.add_child(this.label)
 
     this.box.connect('button-press-event', (_, event) => {
       let button = event.get_button()
@@ -175,11 +178,11 @@ class GithubNotifications {
     const process = Gio.Subprocess.new([program], flags)
     const cancellable = new Gio.Cancellable()
 
-    const [stdout, stderr] = await process.communicate_utf8_async(inputText, cancellable)
+    const [_unused,stdout, stderr] = await process.communicate_utf8(inputText, cancellable)
 
     if (!process.get_successful()) {
       error('The helper process fails')
-      error(stderr!)
+      error(stderr)
       this.planFetch(this.interval(), true)
       return
     }
@@ -258,7 +261,7 @@ class GithubNotifications {
     let notification: Notification
 
     if (!this._source) {
-      this._source = new SystemNotificationSource('GitHub Notification', 'github')
+      this._source = new Source({title:'GitHub Notification', iconName:'github'})
       this._source.connect('destroy', () => {
         this._source = null
       })
@@ -266,22 +269,21 @@ class GithubNotifications {
     }
 
     if (this._source.notifications.length == 0) {
-      notification = new Notification(this._source, title, message)
-
-      notification.setTransient(true)
-      notification.setResident(false)
+      notification = new Notification({source:this._source, title, body: message, isTransient: true, resident: false});
       notification.connect('activated', this.showBrowserUri.bind(this)) // Open on click
     } else {
-      notification = this._source.notifications[0]
-      notification.update(title, message, { clear: true })
+      notification = this._source.notifications[0];
+      notification.destroy(NotificationDestroyedReason.REPLACED);
+      notification = new Notification({source:this._source, title, body: message, isTransient: true, resident: false})
+      notification.connect('activated', this.showBrowserUri.bind(this)) // Open on click
     }
 
-    this._source.pushNotification(notification)
+    this._source.addNotification(notification)
   }
 }
 
 export default class GithubNotificationsExtension extends Extension {
-  #core: GithubNotifications
+  #core: GithubNotifications | null
 
   public enable(): void {
     this.#core = new GithubNotifications(this)
@@ -289,7 +291,7 @@ export default class GithubNotificationsExtension extends Extension {
   }
 
   public disable(): void {
-    this.#core.stop()
-    this.#core = null as any
+    this.#core?.stop()
+    this.#core = null
   }
 }

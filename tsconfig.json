@@ -9,6 +9,8 @@
     "resolveJsonModule": true,
     "experimentalDecorators": true,
     "incremental": true,
-    "tsBuildInfoFile": ".tsbuildinfo"
-  }
+    "tsBuildInfoFile": ".tsbuildinfo",
+    "skipLibCheck": true
+  },
+  "exclude": ["node_modules"],
 }
