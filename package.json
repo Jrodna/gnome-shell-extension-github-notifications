@@ -1,6 +1,6 @@
 {
   "name": "gnome-shell-extension-github-notifications",
-  "version": "0.0.0",
+  "version": "0.0.46",
   "private": true,
   "type": "module",
   "license": "GPL-2.0-only",
