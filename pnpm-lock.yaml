@@ -22,7 +22,7 @@ dependencies:
     version: 2.80.3-4.0.0-beta.14
   '@girs/gjs':
     specifier: ^4.0.0-beta.14
-    version: 4.0.0-beta.14
+    version: 4.0.0-beta.15
   '@girs/glib-2.0':
     specifier: 2.80.3-4.0.0-beta.14
     version: 2.80.3-4.0.0-beta.14
@@ -44,6 +44,9 @@ dependencies:
   '@girs/shell-14':
     specifier: 14.0.0-4.0.0-beta.14
     version: 14.0.0-4.0.0-beta.14
+  '@girs/soup-3.0':
+    specifier: 3.4.4-4.0.0-beta.14
+    version: 3.4.4-4.0.0-beta.14
   '@girs/st-14':
     specifier: 14.0.0-4.0.0-beta.14
     version: 14.0.0-4.0.0-beta.14
@@ -115,6 +118,14 @@ packages:
       '@girs/gjs': 4.0.0-beta.14
       '@girs/glib-2.0': 2.80.3-4.0.0-beta.14
       '@girs/gobject-2.0': 2.80.3-4.0.0-beta.14
+    dev: false
+
+  /@girs/cairo-1.0@1.0.0-4.0.0-beta.15:
+    resolution: {integrity: sha512-5AAKPp4REjlvE0YMgZrs7rJudBKoM/jzbUyym3amnhkb1Th2L/S/iANX7X0/dYhtVoajZlo7edDHzUXxSJNe/Q==}
+    dependencies:
+      '@girs/gjs': 4.0.0-beta.15
+      '@girs/glib-2.0': 2.80.3-4.0.0-beta.15
+      '@girs/gobject-2.0': 2.80.3-4.0.0-beta.15
     dev: false
 
   /@girs/cally-14@14.0.0-4.0.0-beta.12:
@@ -439,6 +450,15 @@ packages:
       '@girs/gobject-2.0': 2.80.3-4.0.0-beta.14
     dev: false
 
+  /@girs/gjs@4.0.0-beta.15:
+    resolution: {integrity: sha512-Oa95oCD8PV0AVbOgVSon3qQ2v0kFuVgLz2t6OoJLiHW5JspXx4Juc8c+11rEZ7O/0RVi3/DqYmM0OUCBEe1RSg==}
+    dependencies:
+      '@girs/cairo-1.0': 1.0.0-4.0.0-beta.15
+      '@girs/gio-2.0': 2.80.3-4.0.0-beta.14
+      '@girs/glib-2.0': 2.80.3-4.0.0-beta.15
+      '@girs/gobject-2.0': 2.80.3-4.0.0-beta.15
+    dev: false
+
   /@girs/gl-1.0@1.0.0-4.0.0-beta.12:
     resolution: {integrity: sha512-GAf1qugs6Xb68NShKcSJmOPpfHtUN5W1sQkLYOD7jUlRi/VinL+0kFvISyFVbBcNSxAIbWXlkiaAE0AlmIZqPQ==}
     dependencies:
@@ -465,6 +485,13 @@ packages:
     dependencies:
       '@girs/gjs': 4.0.0-beta.14
       '@girs/gobject-2.0': 2.80.3-4.0.0-beta.14
+    dev: false
+
+  /@girs/glib-2.0@2.80.3-4.0.0-beta.15:
+    resolution: {integrity: sha512-v9UJ83i+zFnicPsjYhw54Q55DVQ6oqfmef4EKXvsfjKYZF7WiaUWVp/dGAIUzanR0FGbdme6myZRJvYZp9EHcA==}
+    dependencies:
+      '@girs/gjs': 4.0.0-beta.15
+      '@girs/gobject-2.0': 2.80.3-4.0.0-beta.15
     dev: false
 
   /@girs/gmodule-2.0@2.0.0-4.0.0-beta.12:
@@ -565,6 +592,13 @@ packages:
     dependencies:
       '@girs/gjs': 4.0.0-beta.14
       '@girs/glib-2.0': 2.80.3-4.0.0-beta.14
+    dev: false
+
+  /@girs/gobject-2.0@2.80.3-4.0.0-beta.15:
+    resolution: {integrity: sha512-/t1B/aaEMEa/MCIeBc69RQBI+b0kdUyY27FWIPNoG8QOXB4DNe07O9N3p1w7+QDmqw8dkLJMFexfFwdQ+5LC9w==}
+    dependencies:
+      '@girs/gjs': 4.0.0-beta.15
+      '@girs/glib-2.0': 2.80.3-4.0.0-beta.15
     dev: false
 
   /@girs/graphene-1.0@1.0.0-4.0.0-beta.12:
@@ -930,6 +964,16 @@ packages:
       '@girs/harfbuzz-0.0': 8.4.0-4.0.0-beta.12
       '@girs/pango-1.0': 1.54.0-4.0.0-beta.12
       '@girs/pangocairo-1.0': 1.0.0-4.0.0-beta.12
+    dev: false
+
+  /@girs/soup-3.0@3.4.4-4.0.0-beta.14:
+    resolution: {integrity: sha512-KwUblP7bscObScLevGAApUz5YnoUNsaBSk1Jr7gQ6W936wlIAfSH+vnqqbNe1Vxla1Bw/Teudj2QRRcgAzof2A==}
+    dependencies:
+      '@girs/gio-2.0': 2.80.3-4.0.0-beta.14
+      '@girs/gjs': 4.0.0-beta.14
+      '@girs/glib-2.0': 2.80.3-4.0.0-beta.14
+      '@girs/gmodule-2.0': 2.0.0-4.0.0-beta.14
+      '@girs/gobject-2.0': 2.80.3-4.0.0-beta.14
     dev: false
 
   /@girs/st-14@14.0.0-4.0.0-beta.12:

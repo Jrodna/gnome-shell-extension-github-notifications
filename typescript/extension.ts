@@ -4,6 +4,7 @@ import Gdk from 'gi://Gdk'
 import Gio from 'gi://Gio'
 import Gtk from 'gi://Gtk'
 import St from 'gi://St'
+import Soup from '@girs/soup-3.0'
 
 import { Extension } from 'resource:///org/gnome/shell/extensions/extension.js'
 import * as Main from 'resource:///org/gnome/shell/ui/main.js'
@@ -162,6 +163,8 @@ class GithubNotifications {
   }
 
   private async fetchNotifications(): Promise<void> {
+
+    // const message = Soup
     const inputObject: Input = {
       domain: this.domain,
       token: this.token,
@@ -178,57 +181,68 @@ class GithubNotifications {
     const process = Gio.Subprocess.new([program], flags)
     const cancellable = new Gio.Cancellable()
 
-    const [_unused,stdout, stderr] = await process.communicate_utf8(inputText, cancellable)
-
-    if (!process.get_successful()) {
-      error('The helper process fails')
-      error(stderr)
-      this.planFetch(this.interval(), true)
-      return
-    }
-
-    if (!stdout) {
-      this.planFetch(this.interval(), true)
-      throw new TypeError('stdout is null')
-    }
-
-    const output: Output = JSON.parse(stdout)
-
-    if (output.type == 'Unauthorized') {
-      error('Unauthorized. Check your token in the settings')
-      this.label.set_text('!')
-      this.planFetch(this.interval(), true)
-      return
-    }
-
-    if (output.type == 'OtherFailure') {
-      const { response, status_code } = output
-      error('HTTP error: ' + status_code)
-      error('response error: ' + JSON.stringify(response))
-      this.planFetch(this.interval(), true)
-      return
-    }
-
-    if (output.type != 'Success') {
-      const _: never = output // type guard
-      throw new Error(`Variant not handled: ${(output as Output).type}`)
-    }
-
-    const { last_modified, poll_interval, status_code, response } = output
-
-    if (last_modified) {
-      this.lastModified = last_modified
-    }
-
-    if (poll_interval) {
-      this.githubInterval = Number(poll_interval)
-    }
-
-    this.planFetch(this.interval(), false)
-
-    if (status_code == 200) {
-      this.updateNotifications(response)
-    }
+    await process.communicate_utf8_async(inputText, cancellable,(proc, res) => {
+      try {
+        if(!proc) {
+          error('The helper process fails')
+          this.planFetch(this.interval(), true)
+          return
+        }
+        let [,stdout, stderr] = process.communicate_utf8_finish(res)
+      
+        if (!proc.get_successful()) {
+          error('The helper process fails')
+          error(stderr)
+          this.planFetch(this.interval(), true)
+          return
+        }
+    
+        if (!stdout) {
+          this.planFetch(this.interval(), true)
+          throw new TypeError('stdout is null')
+        }
+    
+        const output: Output = JSON.parse(stdout)
+    
+        if (output.type == 'Unauthorized') {
+          error('Unauthorized. Check your token in the settings')
+          this.label.set_text('!')
+          this.planFetch(this.interval(), true)
+          return
+        }
+    
+        if (output.type == 'OtherFailure') {
+          const { response, status_code } = output
+          error('HTTP error: ' + status_code)
+          error('response error: ' + JSON.stringify(response))
+          this.planFetch(this.interval(), true)
+          return
+        }
+    
+        if (output.type != 'Success') {
+          const _: never = output // type guard
+          throw new Error(`Variant not handled: ${(output as Output).type}`)
+        }
+    
+        const { last_modified, poll_interval, status_code, response } = output
+    
+        if (last_modified) {
+          this.lastModified = last_modified
+        }
+    
+        if (poll_interval) {
+          this.githubInterval = Number(poll_interval)
+        }
+    
+        this.planFetch(this.interval(), false)
+    
+        if (status_code == 200) {
+          this.updateNotifications(response)
+        }
+      } catch (_e) {
+        error('Unknown error')
+      }
+    })
   }
 
   private updateNotifications(data: Item[]): void {

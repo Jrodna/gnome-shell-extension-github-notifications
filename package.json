@@ -18,7 +18,8 @@
     "@girs/pango-1.0": "1.54.0-4.0.0-beta.14",
     "@girs/pangocairo-1.0": "1.0.0-4.0.0-beta.14",
     "@girs/shell-14": "14.0.0-4.0.0-beta.14",
-    "@girs/st-14": "14.0.0-4.0.0-beta.14"
+    "@girs/st-14": "14.0.0-4.0.0-beta.14",
+    "@girs/soup-3.0": "3.4.4-4.0.0-beta.14"
   },
   "devDependencies": {
     "typescript": "^5.5.4"
